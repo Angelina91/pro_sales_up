@@ -2,14 +2,14 @@ import json
 import logging
 
 
-JSON_PRICE_FILE = './data/price.json'
+JSON_INVENTORY1_FILE = './data/inventory1.json'
 
 
-def price_json_excep_logging(file_path):
-    """ Сбор исключений и логгирование price.json """
-    logger = logging.getLogger('json_processing')
+def inventory1_json_excep_logging(file_path):
+    """ Сбор исключений и логгирование inventory1.json """
+    logger = logging.getLogger('json_processing_1')
     logger.setLevel(logging.WARNING)
-    log_file = './logs/price.log'
+    log_file = './logs/inventory1.log'
     file_handler = logging.FileHandler(log_file)
     file_handler.setLevel(logging.WARNING)
     logger.addHandler(file_handler)
@@ -25,4 +25,4 @@ def price_json_excep_logging(file_path):
                 continue
 
 
-price_json_excep_logging(JSON_PRICE_FILE)
+inventory1_json_excep_logging(JSON_INVENTORY1_FILE)

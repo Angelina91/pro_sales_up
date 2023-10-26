@@ -1,0 +1,60 @@
+WITH ProductCategory_hierarchy AS (
+SELECT pc.Id AS Id,
+CONCAT('ProductCategory ', CAST(pc.Id AS VARCHAR(max)), ':', pc.Name) AS cat
+FROM ProductCategory pc
+WHERE pc.Parent IS NULL
+UNION ALL
+SELECT pc.Id AS Id,
+CONCAT(pch.cat, '&&ProductCategory ', CAST(pc.Id AS VARCHAR(max)), ':', pc.Name) AS cat
+FROM ProductCategory pc
+INNER JOIN ProductCategory_hierarchy pch ON pch.Id = pc.Parent
+),
+PrevPurchases AS (
+SELECT lps.Period AS Period,
+lps.AccountID AS AccountID,
+CAST(LAG(lps.Period) OVER (PARTITION BY lps.AccountID ORDER BY lps.Period) AS DATETIME) AS prev_period,
+DATEDIFF(DAY, LAG(lps.Period) OVER (PARTITION BY lps.AccountID ORDER BY lps.Period), lps.Period) AS days_since_prev_purchase
+FROM LoyaltyProgramSales lps
+WHERE lps.Amount >= 0
+GROUP BY lps.AccountID, lps.Period
+)
+SELECT TOP 1 lps.ModifiedDate,
+SUM(lps.Amount) OVER (PARTITION BY s.Code, s1.Code, lps.Period, lps.IDSale) AS amount,
+CAST(DATEADD(SECOND, 43200 + CHECKSUM(lps.IDSale) % 43200, DATEADD(DAY, DATEDIFF(DAY, 0, lps.Period), 0)) AS DATETIME) AS ts,
+0 AS discount,
+ISNULL(e.Name, '') AS cashier,
+LTRIM(RTRIM(lps.IDSale)) AS ext_id,
+CONCAT(s1.Code, '-', s.Code) AS store_ext_id,
+pp.prev_period,
+pp.days_since_prev_purchase,
+CASE
+WHEN (a.StatusLP IN (15, 16)) THEN 1
+ELSE 0
+END AS is_installer,
+SUM(lps.ProfitZP) OVER (PARTITION BY s.Code, s1.Code, lps.Period, lps.IDSale) AS profit,
+CASE
+WHEN (lps.Amount >= 0 AND MIN(lps.IDSale) OVER (PARTITION BY lps.AccountID, lps.Period) = lps.IDSale) THEN 1
+ELSE 0
+END AS is_first_daily_purchase,
+CASE
+WHEN (lps.Amount >= 0 AND a.AccountDate = lps.Period AND MIN(lps.IDSale) OVER (PARTITION BY lps.AccountID, lps.Period) = lps.IDSale) THEN 1
+ELSE 0
+END AS is_new_account,
+COALESCE(a.StatusLP, -1) AS status_lp,
+lps.PaymentType,
+p.Name AS name,
+lps.ProductID AS price_ext_id,
+ABS(lps.Quantity) AS count,
+ABS(lps.Amount) AS total,
+pch.cat AS prod_category,
+lps.DocumentLines AS line_count
+FROM LoyaltyProgramSales lps
+LEFT OUTER JOIN Employee e ON e.Id = lps.EmployeeID
+LEFT OUTER JOIN Account a ON a.Id = lps.AccountID
+LEFT OUTER JOIN Product p ON p.Id = lps.ProductID
+LEFT OUTER JOIN ProductCategory_hierarchy pch ON pch.Id = p.ProductCategory
+LEFT OUTER JOIN Store s ON s.Id = lps.StoreID
+LEFT OUTER JOIN Store s1 ON s.Parent_1CID = s1.1C_Id
+LEFT OUTER JOIN PrevPurchases pp ON pp.AccountID = lps.AccountID AND pp.Period = lps.Period
+WHERE lps.Amount >= 0
+ORDER BY lps.ModifiedDate, ext_id, store_ext_id
