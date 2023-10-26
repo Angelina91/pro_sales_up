@@ -3,8 +3,10 @@ import json
 import logging
 import sys
 
-from ..skript import JSON_PRICE_FILE
-from .exceptions import PriceError
+import exceptions
+
+
+JSON_PRICE_FILE = '../data/price.json'
 
 
 def main():
@@ -26,7 +28,7 @@ def main():
 
         try:
             isinstance(volume, (decimal, str))
-        except PriceError as error:
+        except exceptions.PriceError as error:
             message = f'Непредусмотренный формат значения поля {error}'
             logging.warning(message)
         finally:
