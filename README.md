@@ -22,11 +22,11 @@
 
 > В файле ✨price.json ✨:
 
-- [![Method|inventoryUpdateBatch](https://support.heado.ru/api/management/#method_inventoryUpdateBatch)]
+- [![Method|inventoryUpdateBatch](https://support.heado.ru/api/management/#method_inventoryUpdateBatch)](https://support.heado.ru)
 
 > В файлах ✨inventory1.json ✨ и ✨inventory2.json ✨:
 
-- [![Price|updateBatch](https://support.heado.ru/api/management/#method_priceupdatebatch)]
+- [![Price|updateBatch](https://support.heado.ru/api/management/#method_priceupdatebatch)](https://support.heado.ru)
 
 `Поехали!`
 
@@ -35,7 +35,7 @@
 Перед запуском необходимо склонировать проект:
 
 ```bash
-SSH: git clone git@github.com:Angelina91/foodgram-project-react.git
+SSH: git clone git@github.com:Angelina91/pro_sales_up.git
 ```
 
 ## Автор
