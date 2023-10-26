@@ -22,8 +22,8 @@ FORMATS_INVENTORY = {
 }
 
 
-def csv_to_json_price(csv_file_path, json_file_path):
-    """Получение данных .csv и преобразование в формат .json"""
+def csv_to_json_price(csv_file_path: str, json_file_path: str) -> json:
+    """ Получение данных .csv и преобразование в формат .json. """
 
     json_list = [SPECIFICATION_PRICERUNNER]
 
@@ -43,13 +43,13 @@ def csv_to_json_price(csv_file_path, json_file_path):
                 allow_nan=False,
                 cls=None,
                 default=None,
-                indent=9
+                indent=4
             )
         )
 
 
-def csv_to_json_inventory(csv_file_path, json_file_path):
-    """Получение данных .csv и преобразование в формат .json"""
+def csv_to_json_inventory(csv_file_path: str, json_file_path: str) -> json:
+    """ Получение данных .csv и преобразование в формат .json. """
 
     json_list = [SPECIFICATION_INVENTORYRUNNER]
 
@@ -69,7 +69,7 @@ def csv_to_json_inventory(csv_file_path, json_file_path):
                 allow_nan=False,
                 cls=None,
                 default=None,
-                indent=9
+                indent=4
             )
         )
 
